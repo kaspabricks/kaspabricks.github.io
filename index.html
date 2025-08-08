@@ -365,12 +365,20 @@ Nothing is set in stone yet, and I’d love to hear ideas from the community on 
       <p>Join the <a href="https://discord.gg/weGht3FC" target="_blank" rel="noopener noreferrer">Kaspa Bricks Discord Server</a></p>
 
     </section>
-        <footer>
-      <p>© 2025 Kaspa Bricks. All rights reserved.</p>
-    <script>
-  // Toggle menú hamburguesa
+       <footer>
+  <p>© 2025 Kaspa Bricks. All rights reserved.</p>
+</footer>
+</div>
+
+<!-- Botón "Ir arriba" -->
+<button id="backToTopBtn" title="Go to the top">⬆️</button>
+
+<script>
   const menuToggle = document.getElementById('menuToggle');
   const menu = document.getElementById('menu');
+  const backToTopBtn = document.getElementById('backToTopBtn');
+
+  // Toggle menú hamburguesa
   if (menuToggle && menu) {
     menuToggle.addEventListener('click', () => {
       menu.classList.toggle('open');
@@ -385,20 +393,19 @@ Nothing is set in stone yet, and I’d love to hear ideas from the community on 
       }
     });
 
-    // ✅ Cerrar menú al tocar fuera de él
-    document.addEventListener('click', (event) => {
-      const isClickInsideMenu = menu.contains(event.target);
-      const isClickOnToggle = menuToggle.contains(event.target);
+    // Cerrar menú al clickear fuera (solo en móvil)
+    document.addEventListener('click', (e) => {
+      const isClickInsideMenu = menu.contains(e.target);
+      const isClickOnToggle = menuToggle.contains(e.target);
 
-      if (!isClickInsideMenu && !isClickOnToggle && document.body.classList.contains('menu-open')) {
+      if (!isClickInsideMenu && !isClickOnToggle && menu.classList.contains('open')) {
         menu.classList.remove('open');
         document.body.classList.remove('menu-open');
       }
     });
   }
 
-  // Botón "Ir arriba"
-  const backToTopBtn = document.getElementById('backToTopBtn');
+  // Mostrar botón "Ir arriba" siempre que se scrollee más de 300px
   window.addEventListener('scroll', () => {
     if (window.scrollY > 300) {
       backToTopBtn.style.display = 'block';
@@ -406,7 +413,12 @@ Nothing is set in stone yet, and I’d love to hear ideas from the community on 
       backToTopBtn.style.display = 'none';
     }
   });
+
+  // Scroll suave al hacer click en botón "Ir arriba"
   backToTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 </script>
+
+</body>
+</html>
