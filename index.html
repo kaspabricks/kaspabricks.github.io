@@ -367,44 +367,46 @@ Nothing is set in stone yet, and I’d love to hear ideas from the community on 
     </section>
         <footer>
       <p>© 2025 Kaspa Bricks. All rights reserved.</p>
-    </footer>
-  </div>
+    <script>
+  // Toggle menú hamburguesa
+  const menuToggle = document.getElementById('menuToggle');
+  const menu = document.getElementById('menu');
+  if (menuToggle && menu) {
+    menuToggle.addEventListener('click', () => {
+      menu.classList.toggle('open');
+      document.body.classList.toggle('menu-open');
+    });
 
-  <!-- Botón "Ir arriba" -->
-  <button id="backToTopBtn" title="Go to the top">⬆️</button>
-
-  <script>
-    // Si no usás menú hamburguesa, podés borrar esto:
-    const menuToggle = document.getElementById('menuToggle');
-    const menu = document.getElementById('menu');
-    if (menuToggle && menu) {
-      menuToggle.addEventListener('click', () => {
+    menuToggle.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
         menu.classList.toggle('open');
         document.body.classList.toggle('menu-open');
-      });
-
-      menuToggle.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          menu.classList.toggle('open');
-          document.body.classList.toggle('menu-open');
-        }
-      });
-    }
-
-    // Botón "Ir arriba"
-    const backToTopBtn = document.getElementById('backToTopBtn');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 300) {
-        backToTopBtn.style.display = 'block';
-      } else {
-        backToTopBtn.style.display = 'none';
       }
     });
-    backToTopBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  </script>
 
-</body>
-</html>
+    // ✅ Cerrar menú al tocar fuera de él
+    document.addEventListener('click', (event) => {
+      const isClickInsideMenu = menu.contains(event.target);
+      const isClickOnToggle = menuToggle.contains(event.target);
+
+      if (!isClickInsideMenu && !isClickOnToggle && document.body.classList.contains('menu-open')) {
+        menu.classList.remove('open');
+        document.body.classList.remove('menu-open');
+      }
+    });
+  }
+
+  // Botón "Ir arriba"
+  const backToTopBtn = document.getElementById('backToTopBtn');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      backToTopBtn.style.display = 'block';
+    } else {
+      backToTopBtn.style.display = 'none';
+    }
+  });
+  backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
