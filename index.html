@@ -365,28 +365,32 @@ Nothing is set in stone yet, and I’d love to hear ideas from the community on 
       <p>Join the <a href="https://discord.gg/weGht3FC" target="_blank" rel="noopener noreferrer">Kaspa Bricks Discord Server</a></p>
 
     </section>
-    <footer>
+        <footer>
       <p>© 2025 Kaspa Bricks. All rights reserved.</p>
     </footer>
   </div>
 
+  <!-- Botón "Ir arriba" -->
+  <button id="backToTopBtn" title="Go to the top">⬆️</button>
+
   <script>
-    // Toggle menú hamburguesa
+    // Si no usás menú hamburguesa, podés borrar esto:
     const menuToggle = document.getElementById('menuToggle');
     const menu = document.getElementById('menu');
-    menuToggle.addEventListener('click', () => {
-      menu.classList.toggle('open');
-      document.body.classList.toggle('menu-open');
-    });
-
-    // Permitir toggle con teclado (Enter o Espacio)
-    menuToggle.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
+    if (menuToggle && menu) {
+      menuToggle.addEventListener('click', () => {
         menu.classList.toggle('open');
         document.body.classList.toggle('menu-open');
-      }
-    });
+      });
+
+      menuToggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          menu.classList.toggle('open');
+          document.body.classList.toggle('menu-open');
+        }
+      });
+    }
 
     // Botón "Ir arriba"
     const backToTopBtn = document.getElementById('backToTopBtn');
