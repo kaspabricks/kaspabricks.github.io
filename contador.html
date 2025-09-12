@@ -7,7 +7,7 @@
   html, body {
     margin: 0;
     padding: 0;
-    overflow: hidden;       /* evita barras de scroll */
+    overflow: hidden;       /* evita scroll */
     height: 100%;
     background: black;
     display: flex;
@@ -16,10 +16,7 @@
   }
   canvas {
     display: block;
-    width: 100vw;  /* ocupa todo el ancho de la ventana */
-    height: 100vh; /* ocupa todo el alto de la ventana */
-    max-width: 100%;
-    max-height: 100%;
+    /* Sin width/height en CSS para evitar distorsión */
   }
 </style>
 </head>
@@ -41,13 +38,13 @@
   const API_URL = `https://api-v2-private.kas.fyi/addresses/${WALLET}/info`;
   const MAX_KASPA = 100000;
 
-  // Variable global para guardar texto actual
   let currentTexto = '...';
 
-  // Función para redimensionar canvas y redibujar
   function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // Elegimos el lado menor de la ventana para mantener el canvas cuadrado
+    const size = Math.min(window.innerWidth, window.innerHeight);
+    canvas.width = size;
+    canvas.height = size;
 
     actualizarCanvas(currentTexto);
   }
@@ -55,7 +52,7 @@
   fondo.onload = () => {
     resizeCanvas();
     actualizarBalance();
-    setInterval(actualizarBalance, 60000); // refrescar cada 60 segundos
+    setInterval(actualizarBalance, 60000);
   };
 
   window.addEventListener('resize', resizeCanvas);
@@ -86,14 +83,14 @@
   }
 
   function actualizarCanvas(texto) {
-    currentTexto = texto;  // guarda el texto actual
+    currentTexto = texto;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Dibuja fondo escalado a todo el canvas
+    // Dibuja fondo escalado sin deformar (igual al canvas cuadrado)
     ctx.drawImage(fondo, 0, 0, canvas.width, canvas.height);
 
-    // Calcula posición proporcional para el texto (ajustá estos valores si querés)
+    // Posición proporcional dentro del canvas
     const x = canvas.width * 0.35;
     const y = canvas.height * 0.43;
 
@@ -101,12 +98,10 @@
     ctx.translate(x, y);
     ctx.rotate(anguloRad);
 
-    // Tamaño de fuente proporcional al ancho del canvas
     const fontSize = Math.floor(canvas.width * 0.17);
     ctx.font = `${fontSize}px Impact`;
     ctx.textBaseline = 'top';
 
-    // Ajustar posición X si porcentaje menor a 10
     const offsetX = parseFloat(texto) < 10 ? fontSize * 0.33 : 0;
 
     ctx.globalCompositeOperation = 'destination-out';
