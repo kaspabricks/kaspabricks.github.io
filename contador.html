@@ -4,32 +4,36 @@
 <meta charset="UTF-8" />
 <title>Contador Kaspa % Transparente</title>
 <style>
-  body {
+  html, body {
     margin: 0;
+    padding: 0;
+    overflow: hidden;       /* evita barras de scroll */
+    height: 100%;
     background: black;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
   }
   canvas {
     display: block;
+    width: 100vw;  /* ocupa todo el ancho de la ventana */
+    height: 100vh; /* ocupa todo el alto de la ventana */
+    max-width: 100%;
+    max-height: 100%;
   }
 </style>
 </head>
 <body>
 
-<canvas id="canvas" width="1024" height="1024"></canvas>
+<canvas id="canvas"></canvas>
 
 <script>
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
 
   const fondo = new Image();
-  fondo.src = 'fondo.jpg';  // tu imagen base 1024x1024
+  fondo.src = 'fondo.jpg';  // Imagen base 1024x1024
 
-  const x = 360;
-  const y = 440;
   const anguloGrados = -4;
   const anguloRad = anguloGrados * Math.PI / 180;
 
@@ -37,10 +41,24 @@
   const API_URL = `https://api-v2-private.kas.fyi/addresses/${WALLET}/info`;
   const MAX_KASPA = 100000;
 
+  // Variable global para guardar texto actual
+  let currentTexto = '...';
+
+  // Función para redimensionar canvas y redibujar
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    actualizarCanvas(currentTexto);
+  }
+
   fondo.onload = () => {
+    resizeCanvas();
     actualizarBalance();
     setInterval(actualizarBalance, 60000); // refrescar cada 60 segundos
   };
+
+  window.addEventListener('resize', resizeCanvas);
 
   async function actualizarBalance() {
     try {
@@ -51,12 +69,9 @@
       console.log('Datos API:', data);
 
       let balance = 0;
-
-      // El balance viene en yoctokaspa (1 Kaspa = 100,000,000 yocto)
       if (data.balance) {
         balance = Number(data.balance) / 100000000;
       }
-
       if (isNaN(balance)) balance = 0;
 
       const porcentaje = (balance / MAX_KASPA) * 100;
@@ -64,7 +79,6 @@
       console.log('Porcentaje:', porcentaje);
 
       actualizarCanvas(porcentaje.toFixed(2));
-
     } catch(e) {
       console.error('Error:', e);
       actualizarCanvas('Err');
@@ -72,18 +86,28 @@
   }
 
   function actualizarCanvas(texto) {
+    currentTexto = texto;  // guarda el texto actual
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Dibuja fondo escalado a todo el canvas
     ctx.drawImage(fondo, 0, 0, canvas.width, canvas.height);
+
+    // Calcula posición proporcional para el texto (ajustá estos valores si querés)
+    const x = canvas.width * 0.35;
+    const y = canvas.height * 0.43;
 
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(anguloRad);
 
-    ctx.font = '180px Impact';
+    // Tamaño de fuente proporcional al ancho del canvas
+    const fontSize = Math.floor(canvas.width * 0.17);
+    ctx.font = `${fontSize}px Impact`;
     ctx.textBaseline = 'top';
 
-    // Ajustar posición si el porcentaje es menor a 10
-    const offsetX = parseFloat(texto) < 10 ? 60 : 0;
+    // Ajustar posición X si porcentaje menor a 10
+    const offsetX = parseFloat(texto) < 10 ? fontSize * 0.33 : 0;
 
     ctx.globalCompositeOperation = 'destination-out';
     ctx.fillText(texto + '%', offsetX, 0);
