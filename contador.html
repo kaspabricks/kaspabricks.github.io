@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Contador Kaspa % Transparente</title>
+<style>
+  body {
+    margin: 0;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  canvas {
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas" width="1024" height="1024"></canvas>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  const fondo = new Image();
+  fondo.src = 'fondo.jpg';  // tu imagen base 1024x1024
+
+  const x = 360;
+  const y = 440;
+  const anguloGrados = -4;
+  const anguloRad = anguloGrados * Math.PI / 180;
+
+  const WALLET = 'kaspa:qrg43uan89750atpur08ljvlxv36gyf82gy3hf5zq0h0urcsjlfsvk473y4wr';
+  const API_URL = `https://api-v2-private.kas.fyi/addresses/${WALLET}/info`;
+  const MAX_KASPA = 100000;
+
+  fondo.onload = () => {
+    actualizarBalance();
+    setInterval(actualizarBalance, 60000); // refrescar cada 60 segundos
+  };
+
+  async function actualizarBalance() {
+    try {
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error('Error al consultar la API');
+
+      const data = await res.json();
+      console.log('Datos API:', data);
+
+      let balance = 0;
+
+      // El balance viene en yoctokaspa (1 Kaspa = 100,000,000 yocto)
+      if (data.balance) {
+        balance = Number(data.balance) / 100000000;
+      }
+
+      if (isNaN(balance)) balance = 0;
+
+      const porcentaje = (balance / MAX_KASPA) * 100;
+      console.log('Balance Kaspa:', balance);
+      console.log('Porcentaje:', porcentaje);
+
+      actualizarCanvas(porcentaje.toFixed(2));
+
+    } catch(e) {
+      console.error('Error:', e);
+      actualizarCanvas('Err');
+    }
+  }
+
+  function actualizarCanvas(texto) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(fondo, 0, 0, canvas.width, canvas.height);
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(anguloRad);
+
+    ctx.font = '180px Impact';
+    ctx.textBaseline = 'top';
+
+    // Ajustar posición si el porcentaje es menor a 10
+    const offsetX = parseFloat(texto) < 10 ? 60 : 0;
+
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillText(texto + '%', offsetX, 0);
+    ctx.restore();
+
+    ctx.globalCompositeOperation = 'source-over';
+  }
+</script>
+
+</body>
+</html>
