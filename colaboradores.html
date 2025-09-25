@@ -78,6 +78,7 @@
     <div class="grid-item"><img src="11.jpg" alt="11"></div>
   </div>
 
+  <!-- Canvas oculto -->
   <canvas id="canvas" style="display:none;"></canvas>
 
   <script>
@@ -96,25 +97,25 @@
     window.addEventListener('resize', ajustarAlturaFilas);
     window.addEventListener('load', ajustarAlturaFilas);
 
-    // --- Canvas personalizado que se convertirá en imagen ---
+    // --- Canvas y lógica del contador ---
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-
     const fondo = new Image();
-    fondo.src = 'fondo.jpg';  // Asegúrate que esté en el mismo directorio
+    fondo.src = 'fondo.jpg';  // Asegúrate de que exista en tu carpeta
 
     const anguloGrados = -4;
     const anguloRad = anguloGrados * Math.PI / 180;
-
     const WALLET = 'kaspa:qrg43uan89750atpur08ljvlxv36gyf82gy3hf5zq0h0urcsjlfsvk473y4wr';
     const API_URL = `https://api-v2-private.kas.fyi/addresses/${WALLET}/info`;
     const MAX_KASPA = 100000;
 
     let currentTexto = '...';
+    let imagenCanvasRef = null; // <- Referencia al <img> generado por el canvas
 
     fondo.onload = () => {
       resizeCanvas();
       actualizarBalance();
+      setInterval(actualizarBalance, 60000); // Actualiza cada minuto
     };
 
     function resizeCanvas() {
@@ -132,7 +133,7 @@
         let balance = data.balance ? Number(data.balance) / 100000000 : 0;
         const porcentaje = (balance / MAX_KASPA) * 100;
         actualizarCanvas(porcentaje.toFixed(2));
-      } catch(e) {
+      } catch (e) {
         console.error('Error:', e);
         actualizarCanvas('Err');
       }
@@ -163,24 +164,30 @@
 
       ctx.globalCompositeOperation = 'source-over';
 
-      insertarCanvasComoImagen();
+      insertarOActualizarImagenCanvas();
     }
 
-    function insertarCanvasComoImagen() {
-      const grid = document.getElementById('grid');
+    function insertarOActualizarImagenCanvas() {
       const dataURL = canvas.toDataURL('image/png');
 
-      const img = document.createElement('img');
-      img.src = dataURL;
-      img.alt = 'Canvas generado';
-      
-      const div = document.createElement('div');
-      div.className = 'grid-item';
-      div.appendChild(img);
+      if (!imagenCanvasRef) {
+        // Primera vez: crear imagen y agregar al grid
+        const img = document.createElement('img');
+        img.src = dataURL;
+        img.alt = 'Canvas generado';
 
-      grid.appendChild(div);
+        const div = document.createElement('div');
+        div.className = 'grid-item';
+        div.appendChild(img);
 
-      ajustarAlturaFilas();
+        document.getElementById('grid').appendChild(div);
+        imagenCanvasRef = img;
+
+        ajustarAlturaFilas();
+      } else {
+        // Ya existe: solo actualizar src
+        imagenCanvasRef.src = dataURL;
+      }
     }
   </script>
 </body>
