@@ -64,7 +64,7 @@
 </head>
 <body>
   <div id="grid">
-    <!-- 21 imágenes de ejemplo -->
+    <!-- Imágenes fijas -->
     <div class="grid-item"><img src="1.jpg" alt="1"></div>
     <div class="grid-item"><img src="2.jpg" alt="2"></div>
     <div class="grid-item"><img src="3.jpg" alt="3"></div>
@@ -76,8 +76,9 @@
     <div class="grid-item"><img src="9.jpg" alt="9"></div>
     <div class="grid-item"><img src="10.jpg" alt="10"></div>
     <div class="grid-item"><img src="11.jpg" alt="11"></div>
+  </div>
 
-      </div>
+  <canvas id="canvas" style="display:none;"></canvas>
 
   <script>
     function ajustarAlturaFilas() {
@@ -89,14 +90,98 @@
       const gap = 10;
       const totalGapHeight = gap * (filas - 1);
       const alturaFilaPx = (alturaGrid - totalGapHeight) / filas;
-
       grid.style.gridAutoRows = `${alturaFilaPx}px`;
     }
 
     window.addEventListener('resize', ajustarAlturaFilas);
     window.addEventListener('load', ajustarAlturaFilas);
+
+    // --- Canvas personalizado que se convertirá en imagen ---
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const fondo = new Image();
+    fondo.src = 'fondo.jpg';  // Asegúrate que esté en el mismo directorio
+
+    const anguloGrados = -4;
+    const anguloRad = anguloGrados * Math.PI / 180;
+
+    const WALLET = 'kaspa:qrg43uan89750atpur08ljvlxv36gyf82gy3hf5zq0h0urcsjlfsvk473y4wr';
+    const API_URL = `https://api-v2-private.kas.fyi/addresses/${WALLET}/info`;
+    const MAX_KASPA = 100000;
+
+    let currentTexto = '...';
+
+    fondo.onload = () => {
+      resizeCanvas();
+      actualizarBalance();
+    };
+
+    function resizeCanvas() {
+      const size = Math.min(window.innerWidth, window.innerHeight);
+      canvas.width = size;
+      canvas.height = size;
+    }
+
+    async function actualizarBalance() {
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error('Error al consultar la API');
+        const data = await res.json();
+
+        let balance = data.balance ? Number(data.balance) / 100000000 : 0;
+        const porcentaje = (balance / MAX_KASPA) * 100;
+        actualizarCanvas(porcentaje.toFixed(2));
+      } catch(e) {
+        console.error('Error:', e);
+        actualizarCanvas('Err');
+      }
+    }
+
+    function actualizarCanvas(texto) {
+      currentTexto = texto;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(fondo, 0, 0, canvas.width, canvas.height);
+
+      const x = canvas.width * 0.35;
+      const y = canvas.height * 0.43;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(anguloRad);
+
+      const fontSize = Math.floor(canvas.width * 0.17);
+      ctx.font = `${fontSize}px Impact`;
+      ctx.textBaseline = 'top';
+
+      const offsetX = parseFloat(texto) < 10 ? fontSize * 0.33 : 0;
+
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillText(texto + '%', offsetX, 0);
+      ctx.restore();
+
+      ctx.globalCompositeOperation = 'source-over';
+
+      insertarCanvasComoImagen();
+    }
+
+    function insertarCanvasComoImagen() {
+      const grid = document.getElementById('grid');
+      const dataURL = canvas.toDataURL('image/png');
+
+      const img = document.createElement('img');
+      img.src = dataURL;
+      img.alt = 'Canvas generado';
+      
+      const div = document.createElement('div');
+      div.className = 'grid-item';
+      div.appendChild(img);
+
+      grid.appendChild(div);
+
+      ajustarAlturaFilas();
+    }
   </script>
 </body>
 </html>
-
-
