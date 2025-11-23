@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <title>FAP monkey adventures vs BTC Maxis (Mobile)</title>
 <style>
-  body { margin:0; overflow:hidden; background:#000; touch-action: none; }
+  body { margin:0; overflow:hidden; background:#000; touch-action:none; }
   canvas { display:block; }
-  
+
   #musicBtn {
     position:absolute; top:10px; right:10px; z-index:1000;
     padding:12px 18px; font-size:24px; cursor:pointer; border-radius:12px;
@@ -14,7 +14,25 @@
   }
   #musicBtn:hover { background:rgba(255,255,255,0.2); }
 
-  /* Botones táctiles */
+  #startMsg {
+    position:absolute;
+    top:45%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    padding:30px 50px;
+    background:rgba(0,0,0,0.85);
+    border:4px solid white;
+    color:#FFD700;
+    font-size:36px;
+    font-family:'Arial Black', Arial, sans-serif;
+    text-align:center;
+    border-radius:20px;
+    box-shadow:0 0 20px rgba(255,255,255,0.7);
+    opacity:1;
+    transition:opacity 1s ease-out;
+    z-index:2000;
+  }
+
   #mobileControls {
     position:absolute; bottom:20px; left:0; right:0; display:flex; justify-content:space-around; z-index:1000;
   }
@@ -29,8 +47,8 @@
 
 <canvas id="game"></canvas>
 <button id="musicBtn">Music On</button>
+<div id="startMsg">COLLECT 25 JARS TO FACE SAYLOR</div>
 
-<!-- Controles táctiles -->
 <div id="mobileControls">
   <div class="controlBtn" id="leftBtn">◀️</div>
   <div class="controlBtn" id="jumpBtn">⬆️</div>
@@ -38,11 +56,12 @@
 </div>
 
 <script>
+// -------------------- SETUP --------------------
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const WORLD_WIDTH = 2000;
 
-// ---------- IMÁGENES ----------
+// IMÁGENES
 const playerGif = new Image(); playerGif.src = "monito.gif";
 const enemySprite = new Image(); enemySprite.src = "mario.png";
 const bossSprite = new Image(); bossSprite.src = "MS.png";
@@ -51,15 +70,15 @@ const bgFlash = new Image(); bgFlash.src = "saylorloco.jpg";
 const winImg = new Image(); winImg.src = "win.png";
 let currentBg = bgDefault;
 
-// ---------- AUDIO ----------
+// AUDIOS
 const monitoSound = new Audio("monito.mp3");
 const damageSound = new Audio("damage.mp3");
-const bgMusic = new Audio("jumanji.mp3"); bgMusic.loop=true; bgMusic.volume=0.3;
+const bgMusic = new Audio("jumanji.mp3"); bgMusic.loop = true; bgMusic.volume = 0.3;
 const bossSound = new Audio("second.mp3");
 const winSound = new Audio("risa.mp3");
 
-// ---------- CONFIG ----------
-const GRAVITY = 0.6; // un poco más ligero
+// CONFIG
+const GRAVITY = 0.6;
 let cameraX = 0;
 let survivalTime = 0;
 let killCount = 0;
@@ -69,78 +88,55 @@ let invincible = false;
 let win = false;
 let gameOver = false;
 
-// ---------- SCREEN SHAKE ----------
+// SCREEN SHAKE
 let screenShake = false;
 let shakeEndTime = 0;
 
-// ---------- PLAYER ----------
-let player = {
-  x: 100, y: 0, w: 50, h: 50,
-  originalW:50, originalH:50,
-  vx:0, vy:0, speed:5, jumpPower:14,
-  grounded:false, facing:1
-};
+// PLAYER
+let player = { x:100, y:0, w:50, h:50, originalW:50, originalH:50, vx:0, vy:0, speed:5, jumpPower:14, grounded:false, facing:1 };
 
-// ---------- INPUT ----------
+// INPUT
 const keys = {};
 function addTouchKey(key, btn){
   btn.addEventListener("touchstart", e=>{ e.preventDefault(); keys[key]=true; });
   btn.addEventListener("touchend", e=>{ e.preventDefault(); keys[key]=false; });
   btn.addEventListener("touchcancel", e=>{ e.preventDefault(); keys[key]=false; });
 }
-
 addTouchKey("ArrowLeft", document.getElementById("leftBtn"));
 addTouchKey("ArrowRight", document.getElementById("rightBtn"));
 addTouchKey(" ", document.getElementById("jumpBtn"));
-
-// ---------- TECLADO PARA TEST ----------
 window.addEventListener("keydown", e=>keys[e.key]=true);
 window.addEventListener("keyup", e=>keys[e.key]=false);
 
-// ---------- PLATAFORMAS ----------
-const platforms = [
-  {x:0, y:450, w:2000, h:50},
-  {x:300, y:350, w:200, h:20},
-  {x:650, y:300, w:200, h:20},
-  {x:1200, y:330, w:200, h:20}
-];
-const walls = [{x:-50, y:0, w:50, h:500},{x:2000, y:0, w:50, h:500}];
+// PLATAFORMAS Y MUROS
+const platforms = [{x:0, y:450, w:2000, h:50},{x:300,y:350,w:200,h:20},{x:650,y:300,w:200,h:20},{x:1200,y:330,w:200,h:20}];
+const walls = [{x:-50,y:0,w:50,h:500},{x:2000,y:0,w:50,h:500}];
 
-// ---------- ENEMIGOS ----------
+// ENEMIGOS
 let enemies = [];
 let lastEnemySpawn = Date.now();
 
-// ---------- COLLISION ----------
-function aabb(a,b){
-  return a.x<a.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y;
-}
+// -------------------- FUNCIONES --------------------
+function aabb(a,b){ return a.x<a.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y; }
 function resolveCollision(entity, platform){
   if(!aabb(entity, platform)) return;
-  const dxLeft = entity.x+entity.w-platform.x;
-  const dxRight = platform.x+platform.w-entity.x;
-  const dyTop = entity.y+entity.h-platform.y;
-  const dyBottom = platform.y+platform.h-entity.y;
-  const minX=Math.min(dxLeft,dxRight);
-  const minY=Math.min(dyTop,dyBottom);
-  if(minX<minY){
-    if(entity.x<platform.x) entity.x=platform.x-entity.w;
-    else entity.x=platform.x+platform.w;
-    entity.vx=0;
-  } else {
-    if(entity.vy>0){ entity.y=platform.y-entity.h; entity.vy=0; entity.grounded=true; }
-    else if(entity.vy<0){ entity.y=platform.y+platform.h; entity.vy=0; }
-  }
+  const dxLeft=entity.x+entity.w-platform.x;
+  const dxRight=platform.x+platform.w-entity.x;
+  const dyTop=entity.y+entity.h-platform.y;
+  const dyBottom=platform.y+platform.h-entity.y;
+  const minX=Math.min(dxLeft, dxRight);
+  const minY=Math.min(dyTop, dyBottom);
+  if(minX<minY){ if(entity.x<platform.x) entity.x=platform.x-entity.w; else entity.x=platform.x+platform.w; entity.vx=0; }
+  else { if(entity.vy>0){ entity.y=platform.y-entity.h; entity.vy=0; entity.grounded=true; } else if(entity.vy<0){ entity.y=platform.y+platform.h; entity.vy=0; } }
 }
 
-// ---------- PLAYER UPDATE ----------
+// PLAYER UPDATE
 function updatePlayer(){
-  if(keys["ArrowRight"]) { player.vx=player.speed; player.facing=1; }
-  else if(keys["ArrowLeft"]) { player.vx=-player.speed; player.facing=-1; }
+  if(keys["ArrowRight"]){ player.vx=player.speed; player.facing=1; }
+  else if(keys["ArrowLeft"]){ player.vx=-player.speed; player.facing=-1; }
   else player.vx*=0.8;
 
-  if((keys["ArrowUp"] || keys[" "] || keys["w"]) && player.grounded){
-    player.vy=-player.jumpPower; player.grounded=false; beep(300,0.08);
-  }
+  if((keys["ArrowUp"] || keys[" "] || keys["w"]) && player.grounded){ player.vy=-player.jumpPower; player.grounded=false; beep(300,0.08); }
 
   player.vy+=GRAVITY;
   player.x+=player.vx; player.y+=player.vy;
@@ -154,32 +150,64 @@ function updatePlayer(){
   cameraX=Math.max(0, Math.min(WORLD_WIDTH-canvas.width, player.x-canvas.width/2));
 }
 
-// ---------- RESIZE CANVAS ----------
-function resizeCanvas(){
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
+// SPAWN ENEMIGOS
+function spawnEnemy(){
+  if(bossAppeared || win) return;
+  const side = Math.random()<0.5?1:-1;
+  const distance = 500+Math.random()*400;
+  enemies.push({ x:player.x+side*distance, y:0, w:40, h:40, vx:side*-2.5, vy:0, grounded:false });
 }
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
 
-// ---------- LOOP ----------
-let lastTime=performance.now();
-function loop(){
-  const now=performance.now();
-  const delta=(now-lastTime)/1000;
-  lastTime=now;
+// UPDATE ENEMIGOS
+function updateEnemies(){
+  for(let i=enemies.length-1;i>=0;i--){
+    const e=enemies[i];
+    e.vy+=GRAVITY; e.x+=e.vx; e.y+=e.vy; e.grounded=false;
+    for(const p of platforms) resolveCollision(e,p);
+    for(const w of walls) if(aabb(e,w)) e.vx*=-1;
 
-  if(!gameOver && !win){
-    survivalTime+=delta;
-    updatePlayer();
+    if(aabb(player,e)){
+      if(player.vy>0 || invincible){
+        enemies.splice(i,1); killCount++;
+        damageSound.currentTime=0; damageSound.play();
+        currentBg=bgFlash; setTimeout(()=>currentBg=bgDefault,400);
+
+        if(killCount===13){
+          const scream=new Audio("scream.mp3"); scream.play();
+          const previousBg=currentBg;
+          currentBg=new Image(); currentBg.src="rajat.jpg";
+          screenShake=true; shakeEndTime=Date.now()+3000;
+          setTimeout(()=>{ currentBg=previousBg; screenShake=false; },3000);
+        }
+
+        if(killCount===10 && !invincible){
+          player.w=player.h=100; invincible=true; monitoSound.loop=true; monitoSound.play();
+          setTimeout(()=>{ player.w=player.originalW; player.h=player.originalH; invincible=false; monitoSound.pause(); monitoSound.currentTime=0; },15000);
+        }
+      } else { beep(120,0.3); gameOver=true; }
+    }
   }
 
-  draw();
-  requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
+  // Boss
+  if(killCount>=25 && !bossAppeared){
+    bossAppeared=true; boss={ x:player.x+500, y:300, w:200, h:200, vx:2.2, hp:6, spawnTime:Date.now() };
+    bossSound.play(); setTimeout(()=>enemies=[],400);
+  }
+  if(boss){
+    boss.x+=boss.vx; boss.y=300;
+    for(const w of walls) if(aabb(boss,w)) boss.vx*=-1;
+    if(Date.now()-boss.spawnTime>500 && aabb(player,boss)){
+      const stomp=(player.vy>0 && player.y+player.h<boss.y+40);
+      if(stomp || invincible){ boss.hp--; damageSound.play(); player.vy=-12; if(boss.hp<=0){ boss=null; win=true; winSound.play(); } }
+      else{ beep(100,0.4); gameOver=true; }
+    }
+  }
 
-// ---------- DRAW ----------
+  if(!bossAppeared && !win && Date.now()-lastEnemySpawn>1400){ spawnEnemy(); lastEnemySpawn=Date.now(); }
+  if(screenShake && Date.now()>shakeEndTime) screenShake=false;
+}
+
+// DRAW
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   if(currentBg.complete) ctx.drawImage(currentBg,0,0,canvas.width,canvas.height);
@@ -189,46 +217,73 @@ function draw(){
   if(screenShake){ const intensity=6; shakeX=(Math.random()-0.5)*2*intensity; shakeY=(Math.random()-0.5)*2*intensity; }
   ctx.translate(-cameraX+shakeX,shakeY);
 
-  ctx.fillStyle="#654321";
-  for(const p of platforms) ctx.fillRect(p.x,p.y,p.w,p.h);
-  ctx.fillStyle="#333";
-  for(const w of walls) ctx.fillRect(w.x,w.y,w.w,w.h);
-
+  ctx.fillStyle="#654321"; for(const p of platforms) ctx.fillRect(p.x,p.y,p.w,p.h);
+  ctx.fillStyle="#333"; for(const w of walls) ctx.fillRect(w.x,w.y,w.w,w.h);
   for(const e of enemies) if(enemySprite.complete) ctx.drawImage(enemySprite,e.x,e.y,e.w,e.h);
   if(boss && bossSprite.complete) ctx.drawImage(bossSprite,boss.x,boss.y,boss.w,boss.h);
-
-  if(playerGif.complete && !win){
-    ctx.save();
-    ctx.translate(player.x+player.w/2, player.y+player.h/2);
-    ctx.scale(player.facing,1);
-    ctx.drawImage(playerGif,-player.w/2,-player.h/2,player.w,player.h);
-    ctx.restore();
-  }
+  if(playerGif.complete && !win){ ctx.save(); ctx.translate(player.x+player.w/2,player.y+player.h/2); ctx.scale(player.facing,1); ctx.drawImage(playerGif,-player.w/2,-player.h/2,player.w,player.h); ctx.restore(); }
 
   ctx.restore();
 
   ctx.fillStyle="white"; ctx.font="20px Arial";
   ctx.fillText(`Time: ${Math.floor(survivalTime)}s`,20,30);
   ctx.fillText(`Jars: ${killCount}`,20,60);
+
+  if(gameOver){
+    ctx.fillStyle="rgba(0,0,0,0.75)"; ctx.fillRect(canvas.width/2-200,canvas.height/2-80,400,160);
+    ctx.strokeStyle="white"; ctx.lineWidth=4; ctx.strokeRect(canvas.width/2-200,canvas.height/2-80,400,160);
+    ctx.fillStyle="white"; ctx.font="28px Arial"; ctx.textAlign="center";
+    ctx.fillText("TOCA LA PANTALLA PARA REINICIAR",canvas.width/2,canvas.height/2);
+  }
+
+  if(win && winImg.complete){
+    ctx.drawImage(winImg,canvas.width/2-250,canvas.height/2-180,500,360);
+    ctx.fillStyle="white"; ctx.font="28px Arial"; ctx.textAlign="center";
+    ctx.fillText("TOUCH THE SCREEN TO PLAY AGAIN",canvas.width/2,canvas.height/2+150);
+  }
 }
 
-// ---------- BEEP ----------
-function beep(freq,duration=0.1){
-  const ctx=new AudioContext();
-  const o=ctx.createOscillator();
-  const g=ctx.createGain();
-  o.connect(g); g.connect(ctx.destination);
-  o.frequency.value=freq; o.type="square"; g.gain.value=0.1;
-  o.start(); o.stop(ctx.currentTime+duration);
+// LOOP
+let lastTime=performance.now();
+function loop(){
+  const now=performance.now();
+  const delta=(now-lastTime)/1000; lastTime=now;
+  if(!gameOver && !win){ survivalTime+=delta; updatePlayer(); updateEnemies(); }
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// RESET
+function resetGame(){
+  player={ x:100,y:0,w:50,h:50,originalW:50,originalH:50,vx:0,vy:0,speed:5,jumpPower:14,grounded:false,facing:1 };
+  enemies=[]; boss=null; bossAppeared=false; invincible=false; win=false; gameOver=false;
+  killCount=0; survivalTime=0; lastEnemySpawn=Date.now(); currentBg=bgDefault; monitoSound.pause(); monitoSound.currentTime=0;
 }
 
-// ---------- MUSIC ----------
+// ------------------ TOUCH RESTART ------------------
+canvas.addEventListener("touchstart",()=>{ if(gameOver || win) resetGame(); });
+
+// MUSIC
 document.getElementById("musicBtn").addEventListener("click",()=>{
   if(bgMusic.paused){ bgMusic.play(); musicBtn.textContent="Music On"; }
-  else { bgMusic.pause(); musicBtn.textContent="Music Off"; }
+  else{ bgMusic.pause(); musicBtn.textContent="Music Off"; }
 });
 
-// ---------- AUTO PLAY MUSIC EN MOBILE ----------
+// BEEP
+function beep(freq,duration=0.1){ const ctx=new AudioContext(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value=freq; o.type="square"; g.gain.value=0.1; o.start(); o.stop(ctx.currentTime+duration); }
+
+// CANVAS RESIZE
+function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+window.addEventListener("resize",resizeCanvas);
+resizeCanvas();
+
+// START MESSAGE
+setTimeout(()=>{
+  const msg=document.getElementById("startMsg");
+  msg.style.opacity=0; setTimeout(()=>msg.remove(),1000);
+},3000);
+
 document.body.addEventListener("keydown",()=>bgMusic.play(),{once:true});
 document.body.addEventListener("click",()=>bgMusic.play(),{once:true});
 document.body.addEventListener("touchstart",()=>bgMusic.play(),{once:true});
