@@ -13,7 +13,6 @@
   }
   #musicBtn:hover { background:rgba(255,255,255,0.2); }
 
-  /* Start message */
   #startMsg {
     position:absolute;
     top:45%;
@@ -72,6 +71,10 @@ let bossAppeared = false;
 let invincible = false;
 let win = false;
 let gameOver = false;
+
+// ------- SCREEN SHAKE -------
+let screenShake = false;
+let shakeEndTime = 0;
 
 // ------- PLAYER -------
 let player = {
@@ -195,6 +198,21 @@ function updateEnemies() {
         currentBg = bgFlash;
         setTimeout(() => currentBg = bgDefault, 400);
 
+        // --- Easter egg kill 13 ---
+        if (killCount === 13) {
+          const scream = new Audio("scream.mp3");
+          scream.play();
+          const previousBg = currentBg;
+          currentBg = new Image();
+          currentBg.src = "rajat.jpg";
+          screenShake = true;
+          shakeEndTime = Date.now() + 3000;
+          setTimeout(() => {
+            currentBg = previousBg;
+            screenShake = false;
+          }, 3000);
+        }
+
         if (killCount === 10 && !invincible) {
           player.w = player.h = 100;
           invincible = true;
@@ -218,8 +236,8 @@ function updateEnemies() {
     boss = {
       x: player.x + 500,
       y: 300,
-      w: 200,   // **boss bigger**
-      h: 200,   // **boss bigger**
+      w: 200,
+      h: 200,
       vx: 2.2,
       hp: 6,
       spawnTime: Date.now()
@@ -233,7 +251,7 @@ function updateEnemies() {
     else boss.vx = -2.2;
 
     boss.x += boss.vx;
-    boss.y = 300; // stable
+    boss.y = 300;
 
     for (const w of walls) {
       if (aabb(boss, w)) boss.vx *= -1;
@@ -261,6 +279,9 @@ function updateEnemies() {
     spawnEnemy();
     lastEnemySpawn = Date.now();
   }
+
+  // Desactivar temblor si terminó tiempo
+  if(screenShake && Date.now() > shakeEndTime) screenShake = false;
 }
 
 // ------- DRAW -------
@@ -271,7 +292,15 @@ function draw() {
     ctx.drawImage(currentBg, 0,0, canvas.width, canvas.height);
 
   ctx.save();
-  ctx.translate(-cameraX, 0);
+
+  // Temblor de pantalla
+  let shakeX = 0, shakeY = 0;
+  if(screenShake){
+    const intensity = 8;
+    shakeX = (Math.random() - 0.5) * 2 * intensity;
+    shakeY = (Math.random() - 0.5) * 2 * intensity;
+  }
+  ctx.translate(-cameraX + shakeX, shakeY);
 
   ctx.fillStyle="#654321";
   for(const p of platforms) ctx.fillRect(p.x,p.y,p.w,p.h);
@@ -393,4 +422,3 @@ document.body.addEventListener("click",()=>bgMusic.play(),{once:true});
 </script>
 </body>
 </html>
-
