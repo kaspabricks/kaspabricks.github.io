@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>FAP monkey adventures vs BTC Maxis (Mobile)</title>
+<title>FAP Monkey Adventures vs BTC Maxis (Mobile)</title>
 <style>
   body { margin:0; overflow:hidden; background:#000; touch-action:none; }
   canvas { display:block; }
@@ -61,7 +61,7 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const WORLD_WIDTH = 2000;
 
-// IMÁGENES
+// IMAGES
 const playerGif = new Image(); playerGif.src = "monito.gif";
 const enemySprite = new Image(); enemySprite.src = "mario.png";
 const bossSprite = new Image(); bossSprite.src = "MS.png";
@@ -108,15 +108,15 @@ addTouchKey(" ", document.getElementById("jumpBtn"));
 window.addEventListener("keydown", e=>keys[e.key]=true);
 window.addEventListener("keyup", e=>keys[e.key]=false);
 
-// PLATAFORMAS Y MUROS
+// PLATFORMS AND WALLS
 const platforms = [{x:0, y:450, w:2000, h:50},{x:300,y:350,w:200,h:20},{x:650,y:300,w:200,h:20},{x:1200,y:330,w:200,h:20}];
 const walls = [{x:-50,y:0,w:50,h:500},{x:2000,y:0,w:50,h:500}];
 
-// ENEMIGOS
+// ENEMIES
 let enemies = [];
 let lastEnemySpawn = Date.now();
 
-// -------------------- FUNCIONES --------------------
+// -------------------- FUNCTIONS --------------------
 function aabb(a,b){ return a.x<a.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y; }
 function resolveCollision(entity, platform){
   if(!aabb(entity, platform)) return;
@@ -150,7 +150,7 @@ function updatePlayer(){
   cameraX=Math.max(0, Math.min(WORLD_WIDTH-canvas.width, player.x-canvas.width/2));
 }
 
-// SPAWN ENEMIGOS
+// SPAWN ENEMIES
 function spawnEnemy(){
   if(bossAppeared || win) return;
   const side = Math.random()<0.5?1:-1;
@@ -158,7 +158,7 @@ function spawnEnemy(){
   enemies.push({ x:player.x+side*distance, y:0, w:40, h:40, vx:side*-2.5, vy:0, grounded:false });
 }
 
-// UPDATE ENEMIGOS
+// UPDATE ENEMIES
 function updateEnemies(){
   for(let i=enemies.length-1;i>=0;i--){
     const e=enemies[i];
@@ -233,13 +233,13 @@ function draw(){
     ctx.fillStyle="rgba(0,0,0,0.75)"; ctx.fillRect(canvas.width/2-200,canvas.height/2-80,400,160);
     ctx.strokeStyle="white"; ctx.lineWidth=4; ctx.strokeRect(canvas.width/2-200,canvas.height/2-80,400,160);
     ctx.fillStyle="white"; ctx.font="28px Arial"; ctx.textAlign="center";
-    ctx.fillText("TOCA LA PANTALLA PARA REINICIAR",canvas.width/2,canvas.height/2);
+    ctx.fillText("TOUCH SCREEN TO RESTART",canvas.width/2,canvas.height/2);
   }
 
   if(win && winImg.complete){
     ctx.drawImage(winImg,canvas.width/2-250,canvas.height/2-180,500,360);
     ctx.fillStyle="white"; ctx.font="28px Arial"; ctx.textAlign="center";
-    ctx.fillText("TOUCH THE SCREEN TO PLAY AGAIN",canvas.width/2,canvas.height/2+150);
+    ctx.fillText("TOUCH SCREEN TO PLAY AGAIN",canvas.width/2,canvas.height/2+150);
   }
 }
 
