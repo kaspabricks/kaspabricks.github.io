@@ -49,8 +49,7 @@ const playerGif = new Image(); playerGif.src = "monito.gif";
 const enemySprite = new Image(); enemySprite.src = "mario.png";
 const bossSprite = new Image(); bossSprite.src = "MS.png";
 const bgDefault = new Image(); bgDefault.src = "fondo.jpg";
-const bgFlash = new Image(); bgFlash.src = "saylorloco.jpg";
-const rajatBg = new Image(); rajatBg.src = "rajat.jpg";   // NUEVO
+const bgFlash = new Image(); bgFlash.src = "saylorloco.jpg"; 
 const winImg = new Image(); winImg.src = "win.png";
 
 let currentBg = bgDefault;
@@ -193,45 +192,50 @@ function updateEnemies() {
 
     if (aabb(player, e)) {
       if (player.vy > 0 || invincible) {
-
-        // -------- ENEMY KILL --------
         enemies.splice(i, 1);
         killCount++;
-        damageSound.currentTime = 0; 
-        damageSound.play();
+        damageSound.currentTime = 0; damageSound.play();
 
-        // Cambiar fondo normal de hit
+        // --- NORMAL FLASH ---
         currentBg = bgFlash;
         setTimeout(() => currentBg = bgDefault, 400);
 
-        // -------- NUEVO: EFECTO PARA CADA KILL DURANTE POWERUP --------
-        if (invincible) {
-          currentBg = rajatBg;
+        // --- EASTER EGG KILL 13 ---
+        if (killCount === 13) {
+          const scream = new Audio("scream.mp3");
+          scream.play();
+          const previousBg = currentBg;
+          currentBg = new Image();
+          currentBg.src = "rajat.jpg";
+          screenShake = true;
+          shakeEndTime = Date.now() + 3000;
           setTimeout(() => {
-            if (!invincible) currentBg = bgDefault;
-            else currentBg = bgDefault;
-          }, 400);
+            currentBg = previousBg;
+            screenShake = false;
+          }, 3000);
         }
 
-        // -------- POWERUP (MANTENER) --------
+        // --- POWER UP (KILL 10) ---
         if (killCount === 10 && !invincible) {
           player.w = player.h = 100;
           invincible = true;
-
-          // ACTIVAR TEMBLOR 15s
-          screenShake = true;
-          shakeEndTime = Date.now() + 15000;
-
           monitoSound.loop = true; 
           monitoSound.play();
+
+          // SHAKE FOR 15s
+          screenShake = true;
+          shakeEndTime = Date.now() + 15000;
 
           setTimeout(() => {
             player.w = player.originalW;
             player.h = player.originalH;
             invincible = false;
-            screenShake = false;
-            monitoSound.pause(); 
+            monitoSound.pause();
             monitoSound.currentTime = 0;
+
+            // end shake
+            screenShake = false;
+
           }, 15000);
         }
 
@@ -242,7 +246,7 @@ function updateEnemies() {
     }
   }
 
-  // -------- BOSS --------
+  // --- BOSS ---
   if (killCount >= 25 && !bossAppeared) {
     bossAppeared = true;
     boss = {
@@ -258,7 +262,6 @@ function updateEnemies() {
     setTimeout(() => enemies = [], 400);
   }
 
-  // -------- BOSS MOVEMENT --------
   if (boss) {
     if (player.x > boss.x) boss.vx = 2.2;
     else boss.vx = -2.2;
@@ -266,8 +269,9 @@ function updateEnemies() {
     boss.x += boss.vx;
     boss.y = 300;
 
-    for (const w of walls)
+    for (const w of walls) {
       if (aabb(boss, w)) boss.vx *= -1;
+    }
 
     if (Date.now() - boss.spawnTime > 500 && aabb(player, boss)) {
       const stomp = (player.vy > 0 && player.y + player.h < boss.y + 40);
@@ -292,9 +296,7 @@ function updateEnemies() {
     lastEnemySpawn = Date.now();
   }
 
-  // Desactivar temblor
-  if (screenShake && Date.now() > shakeEndTime)
-    screenShake = false;
+  if (screenShake && Date.now() > shakeEndTime) screenShake = false;
 }
 
 // ------- DRAW -------
@@ -316,6 +318,7 @@ function draw() {
 
   ctx.fillStyle="#654321";
   for(const p of platforms) ctx.fillRect(p.x,p.y,p.w,p.h);
+  
   ctx.fillStyle="#333";
   for(const w of walls) ctx.fillRect(w.x,w.y,w.w,w.h);
 
@@ -385,8 +388,7 @@ window.addEventListener("keydown", e=>{
 });
 
 function resetGame(){
-  player={ x:100,y:0,w:50,h:50,originalW:50,originalH:50,
-           vx:0,vy:0,speed:5,jumpPower:15, grounded:false,facing:1 };
+  player={ x:100,y:0,w:50,h:50,originalW:50,originalH:50, vx:0,vy:0,speed:5,jumpPower:15, grounded:false,facing:1 };
   enemies=[];
   boss=null;
   bossAppeared=false;
