@@ -7,7 +7,7 @@
   html, body {
     margin: 0;
     padding: 0;
-    overflow: hidden;       /* evita scroll */
+    overflow: hidden;
     height: 100%;
     background: black;
     display: flex;
@@ -16,7 +16,6 @@
   }
   canvas {
     display: block;
-    /* Sin width/height en CSS para evitar distorsión */
   }
 </style>
 </head>
@@ -29,23 +28,24 @@
   const ctx = canvas.getContext('2d');
 
   const fondo = new Image();
-  fondo.src = 'fondo2.jpg';  // Imagen base 1024x1024
+  fondo.src = 'fondo2.jpg'; // Imagen base 1024x1024
 
   const anguloGrados = -4;
   const anguloRad = anguloGrados * Math.PI / 180;
 
   const WALLET = 'kaspa:qrg43uan89750atpur08ljvlxv36gyf82gy3hf5zq0h0urcsjlfsvk473y4wr';
-  const API_URL = `https://api-v2-private.kas.fyi/addresses/${WALLET}/info`;
-  const MAX_KASPA = 100000;
+
+  // ✅ API CORRECTA DE KASPA
+  const API_URL = `https://api.kaspa.org/addresses/${WALLET}/balance`;
+
+  const MAX_KASPA = 100000; // objetivo para el porcentaje
 
   let currentTexto = '...';
 
   function resizeCanvas() {
-    // Elegimos el lado menor de la ventana para mantener el canvas cuadrado
     const size = Math.min(window.innerWidth, window.innerHeight);
     canvas.width = size;
     canvas.height = size;
-
     actualizarCanvas(currentTexto);
   }
 
@@ -65,18 +65,17 @@
       const data = await res.json();
       console.log('Datos API:', data);
 
-      let balance = 0;
-      if (data.balance) {
-        balance = Number(data.balance) / 100000000;
-      }
-      if (isNaN(balance)) balance = 0;
+      // ✅ balance viene en sompi
+      let balanceKas = Number(data.balance) / 100000000;
+      if (isNaN(balanceKas)) balanceKas = 0;
 
-      const porcentaje = (balance / MAX_KASPA) * 100;
-      console.log('Balance Kaspa:', balance);
+      const porcentaje = (balanceKas / MAX_KASPA) * 100;
+
+      console.log('Balance KAS:', balanceKas);
       console.log('Porcentaje:', porcentaje);
 
       actualizarCanvas(porcentaje.toFixed(2));
-    } catch(e) {
+    } catch (e) {
       console.error('Error:', e);
       actualizarCanvas('Err');
     }
@@ -86,11 +85,8 @@
     currentTexto = texto;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Dibuja fondo escalado sin deformar (igual al canvas cuadrado)
     ctx.drawImage(fondo, 0, 0, canvas.width, canvas.height);
 
-    // Posición proporcional dentro del canvas
     const x = canvas.width * 0.35;
     const y = canvas.height * 0.43;
 
@@ -114,4 +110,3 @@
 
 </body>
 </html>
-
