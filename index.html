@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kaspa Bricks</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kaspa AI Infrastructure</title>
+
   <style>
     body {
       margin: 0;
       padding: 0;
-      background-color: #111;
+      background:
+      radial-gradient(circle at top, #1d3d39 0%, #111 45%);
       color: #fff;
       font-family: 'Segoe UI', sans-serif;
       line-height: 1.6;
@@ -16,43 +18,44 @@
       min-height: 100vh;
     }
 
-    /* Menú fijo a la izquierda */
     nav {
       position: fixed;
       top: 0;
       left: 0;
       width: 220px;
       height: 100vh;
-      background-color: #222;
+      background-color: #161616;
       padding: 20px;
       box-sizing: border-box;
       overflow-y: auto;
-      transition: transform 0.3s ease-in-out;
-      z-index: 1000;
+      border-right: 1px solid rgba(112,199,186,0.15);
     }
+
     nav h2 {
       color: #70C7BA;
       margin-top: 0;
-      font-size: 1.2em;
-      margin-bottom: 15px;
+      font-size: 1.4em;
+      margin-bottom: 20px;
     }
+
     nav a {
       display: block;
       color: #70C7BA;
       text-decoration: none;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       font-weight: 600;
-      transition: color 0.3s;
-    }
-    nav a:hover {
-      color: #a0e0d8;
+      transition: 0.3s;
     }
 
-    /* Contenido principal a la derecha del menú */
+    nav a:hover {
+      color: #a0e0d8;
+      transform: translateX(5px);
+    }
+
     .container {
-      margin-left: 240px; /* deja espacio para el menú */
-      max-width: 800px;
-      padding: 40px 20px;
+      margin-left: 240px;
+      max-width: 900px;
+      padding: 40px 30px;
       flex-grow: 1;
     }
 
@@ -60,37 +63,44 @@
       color: #70C7BA;
     }
 
-    /* Agrandar sólo el título del intro */
     #intro h1 {
-      font-size: 2.8rem;
+      font-size: 3.5rem;
+      line-height: 1.1;
       font-weight: 900;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      text-shadow: 0 0 20px rgba(112,199,186,0.3);
     }
 
     .button {
       display: inline-block;
-      padding: 12px 24px;
-      margin: 20px 0;
+      padding: 14px 28px;
+      margin: 25px 0;
       background-color: #70C7BA;
       color: #111;
       font-weight: bold;
       text-decoration: none;
-      border-radius: 4px;
+      border-radius: 6px;
+      transition: 0.3s;
+    }
+
+    .button:hover {
+      background-color: #9be5d8;
+      transform: scale(1.03);
     }
 
     .section {
-      margin-bottom: 50px;
+      margin-bottom: 80px;
     }
 
     section {
-      scroll-margin-top: 80px; /* para que el título no quede tapado */
+      scroll-margin-top: 80px;
     }
 
     footer {
       text-align: center;
       font-size: 0.9em;
       color: #777;
-      margin-top: 60px;
+      margin-top: 80px;
     }
 
     a {
@@ -98,9 +108,12 @@
       text-decoration: none;
     }
 
-    /* Estilos para el botón "Ir arriba" */
+    ul li {
+      margin-bottom: 10px;
+    }
+
     #backToTopBtn {
-      display: none; /* Oculto por defecto */
+      display: none;
       position: fixed;
       bottom: 40px;
       right: 40px;
@@ -113,359 +126,387 @@
       border-radius: 50%;
       cursor: pointer;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      transition: background-color 0.3s;
+      transition: 0.3s;
     }
+
     #backToTopBtn:hover {
       background-color: #a0e0d8;
     }
 
-    /* --- Responsive --- */
-
-    /* Botón para menú hamburguesa */
-    #menuToggle {
-      display: none;
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 1100;
-      width: 30px;
-      height: 25px;
-      cursor: pointer;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    #menuToggle span {
-      display: block;
-      height: 4px;
-      background: #70C7BA;
-      border-radius: 2px;
-      transition: 0.3s;
+    .quote {
+      border-left: 3px solid #70C7BA;
+      padding-left: 20px;
+      margin: 30px 0;
+      color: #cfcfcf;
+      font-style: italic;
     }
 
-    /* Ocultar menú lateral y mostrar toggle en móvil */
-    @media (max-width: 768px) {
+    @media(max-width: 900px) {
+
       body {
-        display: block;
+        flex-direction: column;
       }
+
       nav {
-        width: 250px;
-        height: 100vh;
-        top: 0;
-        left: 0;
-        background-color: #222;
-        padding: 20px;
-        box-sizing: border-box;
-        position: fixed;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
-        overflow-y: auto;
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid rgba(112,199,186,0.15);
       }
-      nav.open {
-        transform: translateX(0);
-      }
+
       .container {
         margin-left: 0;
-        max-width: 100%;
-        padding: 80px 20px 20px 20px;
       }
-      #menuToggle {
-        display: flex;
-      }
-      /* Cuando el menú está abierto, oscurecer fondo */
-      body.menu-open::before {
-        content: "";
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 900;
-      }
-    }
 
+      #intro h1 {
+        font-size: 2.5rem;
+      }
+
+    }
   </style>
 </head>
+
 <body>
 
-  <!-- Botón hamburguesa móvil -->
-  <div id="menuToggle" aria-label="Toggle navigation menu" role="button" tabindex="0">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
+  <nav>
 
-  <nav id="menu">
-    <h2>Kaspa Bricks Menu</h2>
+    <h2>Kaspa AI</h2>
+
     <a href="#intro">Intro</a>
-    <a href="#about-me">About Me</a>
-    <a href="#why-nfts">Why NFTs & Kaspa?</a>
+    <a href="#vision">Vision</a>
+    <a href="#ai-future">AI Future</a>
+    <a href="#why-kaspa">Why Kaspa?</a>
+    <a href="#decentralized-ai">Decentralized AI</a>
     <a href="#community">Community</a>
-    <a href="#nft-sold">If Sold</a>
-    <a href="#nft-not-sold">If Not Sold</a>
-    <a href="#price">Price</a>
-    <a href="#what-you-get">What You Get</a>
-    <a href="#open-to-ideas">Open to Ideas</a>
-    <a href="#contribute-personally">Contribute Personally</a>
-    <a href="#project-details">Project Details</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#support">Support</a>
     <a href="#contact">Contact</a>
+
   </nav>
 
   <div class="container">
-    <!-- Aquí va TODO tu contenido EXACTO -->
 
     <section class="section" id="intro">
-      <h1>Kaspa Bricks: A milestone for the Kaspa community</h1>
-    <p style="background-color: #70C7BA; color: #000; font-weight: bold; padding: 12px; border-radius: 6px; text-align: center;">
-  ⚠️ THIS IS A PURELY SOLIDARITY-BASED PROJECT AND DOES NOT PROMISE ANY FINANCIAL RETURN. ⚠️<br>
-  However, during the first year, weekly giveaways will be held, and afterward, further raffles will be funded with the profits generated by the ongoing project.
-</p>
 
-<p style="background-color: #f9e79f; color: #000; font-weight: bold; padding: 12px; border-radius: 6px; text-align: center;">
-  💎 Funds will remain <strong>LOCKED</strong> until Kaspa reaches <strong>$1</strong>. No early withdrawals. 💎
-</p>
-     <p><strong>GOAL:</strong> Raise <strong>100,000 KAS</strong> to fund the first home and private, event-ready gaming lounge powered entirely by <strong>Kaspa NFTs</strong> — for someone who can no longer leave home due to health limitations.</p>
+      <h1>
+        The Future of AI Needs Decentralization
+      </h1>
 
-<p><strong>Kaspa Bricks</strong> is more than just a personal story — it’s proof of what’s possible when a strong, real community comes together with real-world utility. This project aims to become the <strong>first home fully funded through NFTs on Kaspa’s PoW-secured network</strong> — a milestone not just for one person, but for the entire ecosystem.</p>
+      <p style="
+        background-color: #70C7BA;
+        color: #000;
+        font-weight: bold;
+        padding: 14px;
+        border-radius: 8px;
+        text-align: center;
+      ">
+        AI is becoming the most powerful technology on Earth —
+        but it cannot remain controlled by a few centralized corporations.
+      </p>
 
-<p>The goal is simple: to help someone who can no longer work outside the home due to physical limitations <strong>build a small but stable life</strong> — a home and a private gaming lounge available for reservation-based events such as birthdays and community gatherings. The lounge, named <strong>Kasplay</strong>, will feature immersive <strong>Kaspa-themed</strong> decor and branding throughout, helping create a sustainable, home-based source of income through exclusive gaming experiences and event hosting.</p>
+      <p>
+        The next generation of Artificial Intelligence must be:
+        <strong>open, decentralized, transparent, and community-driven.</strong>
+      </p>
 
-<p>Each <strong>digital brick</strong> minted is a symbol of what we can build together: <strong>transparent, decentralized, and human</strong>.</p>
-<p>On top of that, <strong>every brick NFT is uniquely numbered</strong>, making it <strong>collectible</strong>. Some bricks may hold special value due to their number or rarity, strengthening the emotional and community connection behind every contribution.</p>
+      <p>
+        Kaspa's ultra-fast Proof-of-Work architecture creates the perfect foundation
+        for scalable decentralized AI systems.
+      </p>
 
-      <a class="button" href="https://kaspa.com/nft/collections/KASBRICKS" target="_blank" rel="noopener noreferrer">View Collection on Kaspa.com</a>
-    </section>
-<div style="text-align: center; margin: 20px 0;">
-    <img
-      src="brick0001.jpg"
-      alt="Brick NFT #0001"
-      style="max-width: 100%; max-width: 400px; height: auto; border-radius: 8px;"
-    />
-  </div>
-</section>
-    
-    <section class="section" id="about-me">
-      <h2>About Me</h2>
-      <p>I'm from Argentina. I first got into crypto back in 2011 when I discovered Bitcoin. I tried some mining, but at the time it didn’t seem worth it — and life was moving fast. I had to work full time, and after the Mt. Gox hack, I stepped away from it all.</p>
-      <p>For years I didn’t pay attention to crypto, until the COVID pandemic hit. Argentina had a really long and strict lockdown, and I had to close my small business for months. Around that time, my health — which had already been an issue — got worse.</p>
-      <p>Stuck at home, unsure of what to do, I started reading about Ethereum mining. I spent what I had saved to build a small GPU rig and relied on credit to get through the following months. It wasn’t ideal, but at the time, it felt like my only chance to survive financially. Later I managed to get a few more GPUs and kept mining until Ethereum switched to Proof of Stake.</p>
-      <p>That’s when I found Kaspa — around August 2022. I remember mining in SOLO and finding blocks that gave me 350 KAS. It felt exciting, like a second chance. I stuck with it. For the next couple of years, I mined Kaspa as much as I could. I sold small amounts to cover basic needs and kept some, believing in its future.</p>
-      <p>My health kept declining during that time. I wasn’t able to go back to my old job, and by 2024 I had to move farther from the city to find cheaper rent. I still did a few tech repair jobs when possible, but they became more and more rare. Between that and the end of GPU mining for Kaspa, things got a lot harder.</p>
-      <p>Now in 2025, I find myself without a steady income, unable to leave home, and with fewer ways to earn. I’m also trying to pay off the debts I accumulated over the past few years, but it’s been incredibly difficult — selling small amounts of the Kaspa I managed to save, month by month, just to get by.
+      <p>
+        This website explores the intersection between:
+        <strong>Kaspa, AI infrastructure, open intelligence, and digital freedom.</strong>
+      </p>
 
-      And that’s the part that hurts the most: I have no doubt in Kaspa’s long-term potential, and it frustrates me deeply to have to let go of what could one day represent a more stable future.
+      <p>
+        We believe the future won't belong to closed systems.
+        It will belong to communities capable of building intelligent networks together.
+      </p>
 
-      Despite these hardships, I remain hopeful about Kaspa’s potential and the supportive community behind it.</p>
-      <p>That’s what led me to create this NFT collection. It’s a way to try something meaningful — not just ask for donations, but offer something to the community in return. The goal is to raise enough to eventually buy a small home with a storefront, so I can live and work from one place. Something sustainable, something honest.</p>
-      <p>I’ve made a commitment: I won’t touch the funds from this project unless Kaspa reaches $1. That’s my way of showing trust and long-term belief in the project and the people around it.</p>
-      <p>If I ever manage to make this dream real, Kaspa will be accepted as a form of payment at the shop, and there’ll be a plaque in the space, dedicated to every person who helped make it possible.</p>
-    </section>
+      <div class="quote">
+        “AI without decentralization becomes digital control.”
+      </div>
 
-    <section class="section" id="why-nfts">
-      <h2>Why NFTs and why Kaspa?</h2>
-      <p>This project doesn’t use NFTs for speculation or hype — it uses them to engage the Kaspa community in something real, instead of simply asking for donations. Every NFT minted represents a piece of a shared goal.</p>
-      <p>Setting aside Kaspa’s undeniable technological strength, what truly inspired this project is the spirit of its community. This is about people helping people — and believing in what we can build together.</p>
-      <p>The funds from this project are not meant for quick use or short-term needs. They will remain untouched until Kaspa reaches $1 — reinforcing the long-term spirit behind this initiative.”</p>
-      <p>NFTs from this collection can also be freely traded or resold on secondary marketplaces that support KRC-721, continuing to promote Kaspa’s growing ecosystem.</p>
-    </section>
-
-   <section class="section" id="community">
-  <h2>More than just NFTs — a real community</h2>
-  <p>
-    Last month, some Bitcoin maximalists questioned the authenticity of Kaspa’s community on X (formerly Twitter), suggesting that our high activity might be driven by bots. While these claims arise from surprise at our engagement, the truth is simple:
-  </p>
-  <p>
-    Behind every Kaspa account is a real person — passionate, dedicated, and committed to building something meaningful together.
-  </p>
-  <p>
-    This project is a testament to that authenticity. Every NFT minted represents a brick laid by genuine people who believe in Kaspa’s vision and community.
-  </p>
-  <p>
-    Kaspa’s strength lies not only in its technology but in the vibrant and real community that supports it.
-  </p>
-
-  <hr style="border-color: #70C7BA; margin: 30px 0;" />
-
-  <p>
-    UPDATE -- Yesterday, August 6th, the community learned about a scam involving NFTs — a project that vanished with funds and deleted all social media channels. This unfortunate event reminds us how important transparency and trust are.
-  </p>
-  <p>
-    In light of this, I’ve been considering entrusting the NFT sale wallet to a respected community member, adding an extra layer of security and confidence.
-  </p>
-  <p>
-    As always, the funds raised will remain untouched until Kaspa reaches $1 — a commitment to long-term belief and responsibility toward the community.
-  </p>
-
-  <hr style="border-color: #70C7BA; margin: 30px 0;" />
-
-  <p>UPDATE -- August 7th. After community feedback, I’ve decided to keep the NFT sale wallet under my name with full transparency, sharing all transactions publicly. Funds will stay locked until Kaspa reaches $1.</p>
-
-  <p>I’m watching Kaspa’s smart contract rollout for future options. If NFTs don’t sell well, I may open a Kas.coffee account to use donations to mint and giveaway NFTs to the community.</p>
-
-  <p><strong>THIS IS SUBJECT TO CHANGE; IF THE COMMUNITY DECIDES, WE CAN MOVE TO A 3RD PARTY OPTION.</strong></p>
-
-  <hr style="border-color: #70C7BA; margin: 30px 0;" />
-
-  <p><strong>UPDATE -- August 22nd.</strong> From now on, all updates will be posted in the Discord channel. Anyone who wants to join is welcome.</p>
-</section>
-
-
-    <section class="section" id="nft-sold">
-      <h2>If the 2000 NFTs are sold...</h2>
-      <p>...then this project becomes a reality. The funds will go toward purchasing a small home with a shop attached, where I can live and work in dignity. Kaspa will be accepted in the store, and there’ll be a wall with the wallets (or names) of every supporter.</p>
-      <p>Leftover KAS will be used for basic setup — furniture, tools, and anything needed to make the place functional. In the future, I’d love to help others in similar situations using this same model.</p>
-    </section>
-
-    <section class="section" id="nft-not-sold">
-      <h2>If they don’t sell...</h2>
-      <p>That’s okay too. Whatever is raised will be saved and held, untouched, until Kaspa reaches $1 — just as promised. Even if only a few NFTs are sold, it’s still support, and it still matters. I’ll do what I can with whatever we raise.</p>
-    </section>
-
-    <section class="section" id="price">
-      <h2>Why 50 Kaspa per NFT?</h2>
-      <p>50 KAS feels like a fair and realistic amount — not too high, not too low. It's meant to be accessible to many, so that this can be a true community project. At current prices, it's affordable, and if Kaspa grows, so does the impact of your support.</p>
-      <p>50 KAS × 2000 NFTs = 100,000 KAS — just enough to make the project happen. Nothing more, nothing less.</p>
-    </section>
-
-   <section class="section" id="what-you-get">
-  <h2>What do you get?</h2>
-  <p>Each NFT is a unique numbered digital brick — a symbol of your support and belief in what we’re building together. The NFTs are tradable, collectible, and forever tied to the story of this project and the power of community.</p>
-  
-  <p>I’m exploring ways for NFT holders to participate in key project decisions. Nothing is set in stone yet, and I’d love to hear ideas from the community on how best to approach this.</p>
-
- <h3>🆕 Update: Weekly Giveaways</h3>
-<p>We're adding an ongoing rewards system to thank our early supporters:</p>
-
-<h4>🎁 Weekly Giveaways (Year 1)</h4>
-<ul>
-  <li>10,000 KAS set aside from the raised funds</li>
-  <li>200 KAS given away every week for ~1 year</li>
-  <li>Giveaways start only once all 2,000 NFTs are sold</li>
-  <li>Winners selected randomly by NFT number (each NFT = 1 ticket)</li>
-</ul>
-
-<h4>🚀 Stage 2 Giveaways (Once KAS = $1)</h4>
-<ul>
-  <li>Funded by a % of Kasplay’s future profits</li>
-  <li>Weekly prize of ~$100 USD (in KAS)</li>
-  <li>Same fair draw system — NFT holders continue to benefit long-term</li>
-</ul>
-
-</section>
+      <a class="button" href="https://kaspa.org" target="_blank">
+        Explore Kaspa
+      </a>
 
     </section>
 
-    <section class="section" id="open-to-ideas">
-  <h2>Open to Ideas</h2>
-  <p>
-    If you have suggestions, feedback, or ideas to improve this initiative — I'm open to hearing them. This is a community-driven project at heart, and your input matters.
-  </p>
-</section>
+    <section class="section" id="vision">
 
-<section class="section" id="contribute-personally">
-<h2>Contribute Personally</h2>
+      <h2>A New Digital Revolution</h2>
 
-<p>
-  While the main way to support this project is by minting NFTs, some people have suggested setting up a donation option as well.
-</p>
+      <p>
+        Artificial Intelligence is evolving faster than society itself.
+      </p>
 
-<p>
-  I'm not looking for donations in the traditional sense — but if you do choose to contribute directly, those funds may be used to mint NFTs and give them away to members of the Kaspa community, as a way to grow awareness and thank supporters.
-</p>
+      <p>
+        In the next few years, AI will redefine:
+      </p>
 
-<p>
-  The wallet address and QR code are just below.
-</p>
+      <ul>
+        <li>Work</li>
+        <li>Creativity</li>
+        <li>Finance</li>
+        <li>Education</li>
+        <li>Communication</li>
+        <li>Global economies</li>
+      </ul>
 
-<p>
-  I'm still exploring the best way to ensure full transparency.
-</p>
+      <p>
+        But there is one major problem:
+        most AI systems are becoming increasingly centralized.
+      </p>
 
-<p>
-  I’m also considering platforms like <a href="https://kas.coffee/" target="_blank" rel="noopener">kas.coffee</a> as possible ways to broaden support if needed — but for now, the core of the project remains the NFT collection.
-</p>
- 
-  <img src="qr.jpeg" alt="QR Wallet Kaspa" style="max-width: 400px; width: 100%; height: auto;">
+      <p>
+        The world needs decentralized alternatives where people —
+        not corporations — remain in control.
+      </p>
 
-</section>
+    </section>
 
-<section class="section" id="project-details">
-  <h2>Project Details</h2>
-  <ul>
-    <li><strong>Total NFTs:</strong> 2000</li>
-    <li><strong>Price per NFT:</strong> 50 KAS</li>
-    <li><strong>Format:</strong> Numbered JPGs</li>
-    <li><strong>Standard:</strong> KRC-721 (Kaspa)</li>
-    <li><strong>Marketplace:</strong> <a href="https://kaspa.com/nft/collections/KASBRICKS" target="_blank" rel="noopener noreferrer">kaspa.com</a></li>
-  </ul>
-</section>
+    <section class="section" id="ai-future">
 
-    <section class="section">
+      <h2>AI Will Change Everything</h2>
+
+      <p>
+        The AI revolution is no longer theoretical.
+      </p>
+
+      <p>
+        Autonomous agents, AI-generated software, robotics,
+        decentralized compute networks, and machine intelligence
+        are already transforming the internet.
+      </p>
+
+      <p>
+        The question is not whether AI will dominate the future.
+      </p>
+
+      <h3>
+        The real question is:
+        Who will control it?
+      </h3>
+
+      <p>
+        Open networks like Kaspa can help create a future
+        where intelligence remains distributed instead of monopolized.
+      </p>
+
+      <div class="quote">
+        “The future of intelligence must remain decentralized.”
+      </div>
+
+    </section>
+
+    <section class="section" id="why-kaspa">
+
+      <h2>Why Kaspa?</h2>
+
+      <p>
+        Kaspa is one of the fastest Proof-of-Work blockchains ever created.
+      </p>
+
+      <p>
+        Its BlockDAG architecture enables:
+      </p>
+
+      <ul>
+        <li>Ultra-fast confirmations</li>
+        <li>Massive scalability</li>
+        <li>Decentralization</li>
+        <li>Security through Proof-of-Work</li>
+      </ul>
+
+      <p>
+        These characteristics make Kaspa uniquely positioned
+        for future AI infrastructure.
+      </p>
+
+      <p>
+        AI systems will require:
+      </p>
+
+      <ul>
+        <li>Fast data settlement</li>
+        <li>Distributed coordination</li>
+        <li>Trustless validation</li>
+        <li>Open ecosystems</li>
+      </ul>
+
+      <p>
+        Kaspa could become a critical layer
+        for decentralized intelligence.
+      </p>
+
+    </section>
+
+    <section class="section" id="decentralized-ai">
+
+      <h2>Decentralized AI</h2>
+
+      <p>
+        AI should not belong to a handful of corporations.
+      </p>
+
+      <p>
+        The future should include:
+      </p>
+
+      <ul>
+        <li>Open-source AI models</li>
+        <li>Distributed compute networks</li>
+        <li>Transparent algorithms</li>
+        <li>Community-owned infrastructure</li>
+      </ul>
+
+      <p>
+        Blockchain technology and AI are converging.
+      </p>
+
+      <p>
+        Kaspa has the potential to become part
+        of that next generation infrastructure.
+      </p>
+
+      <div class="quote">
+        “Open intelligence for an open world.”
+      </div>
+
+    </section>
+
+    <section class="section" id="community">
+
+      <h2>The Community Matters</h2>
+
+      <p>
+        Technology alone is never enough.
+      </p>
+
+      <p>
+        Real revolutions are built by communities.
+      </p>
+
+      <p>
+        Developers, miners, researchers, creators,
+        and believers are helping build a decentralized future around Kaspa.
+      </p>
+
+      <p>
+        The AI era needs open communities capable of resisting centralization.
+      </p>
+
+      <p>
+        That is where real innovation happens.
+      </p>
+
+    </section>
+
+    <section class="section" id="roadmap">
+
+      <h2>Roadmap</h2>
+
+      <ul>
+        <li>Expand AI-focused Kaspa content</li>
+        <li>Create educational resources</li>
+        <li>Build decentralized AI community initiatives</li>
+        <li>Explore AI + Kaspa integrations</li>
+        <li>Support open-source development</li>
+      </ul>
+
+    </section>
+
+    <section class="section" id="support">
+
+      <h2>Support the Vision</h2>
+
+      <p>
+        If you believe in decentralized AI and open infrastructure,
+        you can support the project and help expand the initiative.
+      </p>
+
+      <p>
+        The goal is to grow awareness around:
+      </p>
+
+      <ul>
+        <li>Kaspa</li>
+        <li>Decentralized systems</li>
+        <li>Open AI</li>
+        <li>Community-driven infrastructure</li>
+      </ul>
+
+      <p>
+        Fast money. Fast intelligence. Open networks.
+      </p>
+
+      <img
+        src="https://github.com/kaspabricks/kaspa-bricks-website/blob/main/qr.jpeg"
+        alt="Kaspa QR"
+        style="max-width: 300px; width: 100%; height: auto; border-radius: 10px;"
+      >
+
+    </section>
+
+    <section class="section" id="contact">
+
       <h2>Contact</h2>
-      <p>For questions or support, reach out at: <a href="mailto:kaspabricks@gmail.com">kaspabricks@gmail.com</a></p>
-      <p>Join the <a href="https://discord.gg/weGht3FC" target="_blank" rel="noopener noreferrer">Kaspa Bricks Discord Server</a></p>
+
+      <p>
+        For collaborations, ideas, or support:
+      </p>
+
+      <p>
+        <a href="mailto:kaspabricks@gmail.com">
+          kaspabricks@gmail.com
+        </a>
+      </p>
 
     </section>
-       <footer>
-  <p>© 2025 Kaspa Bricks. All rights reserved.</p>
-</footer>
-</div>
 
-<!-- Botón "Ir arriba" -->
-<button id="backToTopBtn" title="Go to the top">⬆️</button>
+    <footer>
+      © 2026 Kaspa AI — Decentralized Intelligence Infrastructure.
+    </footer>
 
-<script>
-  const menuToggle = document.getElementById('menuToggle');
-  const menu = document.getElementById('menu');
-  const backToTopBtn = document.getElementById('backToTopBtn');
+  </div>
 
-  // Toggle menú hamburguesa
-  if (menuToggle && menu) {
-    menuToggle.addEventListener('click', () => {
-      menu.classList.toggle('open');
-      document.body.classList.toggle('menu-open');
-    });
+  <button id="backToTopBtn" title="Go to the top">
+    ⬆️
+  </button>
 
-    menuToggle.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        menu.classList.toggle('open');
-        document.body.classList.toggle('menu-open');
+  <script>
+
+    const backToTopBtn = document.getElementById('backToTopBtn');
+
+    window.onscroll = function() {
+
+      if (
+        document.body.scrollTop > 300 ||
+        document.documentElement.scrollTop > 300
+      ) {
+
+        backToTopBtn.style.display = "block";
+
+      } else {
+
+        backToTopBtn.style.display = "none";
+
       }
+    };
+
+    backToTopBtn.addEventListener('click', () => {
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+
     });
 
-    // Cerrar menú al clickear fuera (solo en móvil)
-    document.addEventListener('click', (e) => {
-      const isClickInsideMenu = menu.contains(e.target);
-      const isClickOnToggle = menuToggle.contains(e.target);
-
-      if (!isClickInsideMenu && !isClickOnToggle && menu.classList.contains('open')) {
-        menu.classList.remove('open');
-        document.body.classList.remove('menu-open');
-      }
-    });
-  }
-
-  // Mostrar botón "Ir arriba" siempre que se scrollee más de 300px
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-      backToTopBtn.style.display = 'block';
-    } else {
-      backToTopBtn.style.display = 'none';
-    }
-  });
-
-  // Scroll suave al hacer click en botón "Ir arriba"
-  backToTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-</script>
+  </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
